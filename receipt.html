@@ -308,12 +308,12 @@
             'south korea': { flag: 'https://flagcdn.com/w40/kr.png', name: 'SOUTH KOREA', code: 'SOUTH KOREA', currency: 'KRW' },
             'korea': { flag: 'https://flagcdn.com/w40/kr.png', name: 'South Korea', code: 'SOUTH KOREA', currency: 'KRW' },
             'malaysia': { flag: 'https://flagcdn.com/w40/my.png', name: 'Malaysia', code: 'MALAYSIA', currency: 'MYR' },
-            'malaysian': { flag: 'https://flagcdn.com/w40/my.png', name: 'Malaysia', code: 'MALAYSIA', code: 'MALAYSIA', currency: 'MYR' },
+            'malaysian': { flag: 'https://flagcdn.com/w40/my.png', name: 'Malaysia', code: 'MALAYSIA', currency: 'MYR' },
             'singapore': { flag: 'https://flagcdn.com/w40/sg.png', name: 'Singapore', code: 'SINGAPORE', currency: 'SGD' },
             'nepal': { flag: 'https://flagcdn.com/w40/np.png', name: 'Nepal', code: 'NEPAL', currency: 'NPR' },
             'nepali': { flag: 'https://flagcdn.com/w40/np.png', name: 'Nepal', code: 'NEPAL', currency: 'NPR' },
             'vietnam': { flag: 'https://flagcdn.com/w40/vn.png', name: 'Vietnam', code: 'VIETNAM', currency: 'VND' },
-            'vietnamese': { flag: 'https://flagcdn.com/w40/vn.png', name: 'Vietnam', code: 'VIETNAM', code: 'VIETNAM', currency: 'VND' },
+            'vietnamese': { flag: 'https://flagcdn.com/w40/vn.png', name: 'Vietnam', code: 'VIETNAM', currency: 'VND' },
             'united kingdom': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' },
             'uk': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' },
             'britain': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' },
@@ -353,6 +353,9 @@
 
         // Function to generate 2 random digits
         const randomDigits = () => Math.floor(Math.random() * 100).toString().padStart(2, '0');
+
+        // Function to generate 3 random digits
+        const randomThreeDigits = () => Math.floor(Math.random() * 1000).toString().padStart(3, '0');
 
         // Function to add commas to a number
         const addCommas = (numStr) => {
@@ -401,10 +404,10 @@
             payoutCode: formatValue(params.get('payoutCode'))
         };
 
-        // Update reference number if needed
-        if (data.referenceNumber !== 'N/A' && !params.get('referenceNumber')) {
+        // Update reference number with 2 random digits prefix and 3 random digits suffix
+        if (data.referenceNumber !== 'N/A') {
             const prefix = randomDigits();
-            const suffix = randomDigits();
+            const suffix = randomThreeDigits();
             data.referenceNumber = `${prefix}${data.referenceNumber}${suffix}`;
             data.receiptId = data.referenceNumber;
         }
