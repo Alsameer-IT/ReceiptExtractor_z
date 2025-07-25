@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remittance Receipt</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 0.5rem;
+        }
+
+        .receipt-container {
+            width: 100%;
+            max-width: 800px;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .header-section {
+            padding: 0.6rem;
+            border-bottom: 1px solid #000000;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+       
+        .pinno-box {
+            background: #ffffff;
+            border: 2px solid #000000;
+            padding: 0.1rem 0.2rem;
+            width: 210px;
+            margin: 0.4rem 0;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        .cust-id {
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .validity {
+            font-size: 0.8rem;
+        }
+
+        .content-section {
+            display: flex;
+            width: 100%;
+        }
+
+        .left-column {
+            width: 50%;
+            padding-right: 0.5rem;
+        }
+
+        .right-column {
+            width: 50%;
+            padding-left: 0.5rem;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+        }
+
+        .detail-key {
+            color: #000000;
+            font-weight: 400;
+            width: 40%;
+        }
+
+        .detail-value {
+            color: #000000;
+            font-weight: 500;
+            width: 60%;
+        }
+
+        .highlight-box {
+            background: #ffffff;
+            border: 1px solid #000000;
+            padding: 0.3rem;
+            margin: 0.4rem 0;
+        }
+
+        .amount-highlight {
+            font-weight: 700;
+        }
+
+        .footer-section {
+            text-align: center;
+            padding: 0.6rem;
+            border-top: 1px solid #000000;
+            font-size: 0.7rem;
+            color: #000000;
+            width: 100%;
+        }
+
+        .download-btn {
+            background: #000000;
+            color: #ffffff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 0.8rem;
+            width: 100%;
+            max-width: 280px;
+            margin: 0.6rem auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+
+        .download-btn:hover {
+            background: #333333;
+        }
+
+        @media print {
+            body {
+                background: none;
+            }
+            .download-btn {
+                display: none;
+            }
+            .receipt-container {
+                box-shadow: none;
+                border: none;
+                height: auto;
+                overflow: hidden;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="receipt-container" id="receiptContainer">
+        <div class="header-section">
+            <div class="pinno-box" id="pinno" style="display: none;">
+                <div class="detail-row">
+                    <div class="detail-key">PINNO:</div>
+                    <div class="detail-value" id="pin"></div>
+                </div>
+            </div>
+            <div class="pinno-box" id="payoutCodeSection" style="display: none;">
+                <div class="detail-row">
+                    <div class="detail-key">Payout Code:</div>
+                    <div class="detail-value" id="payoutCode"></div>
+                </div>
+            </div>
+            <div class="cust-id" id="custId" style="display: none;">Customer ID: <span id="custIdValue"></span></div>
+            <div class="validity" id="validitySection" style="display: none;">Validity: <span id="validityDate"></span></div>
+        </div>
+
+        <div class="content-section">
+            <div class="left-column">
+                <div class="detail-row">
+                    <div class="detail-key">Sender Name: </div>
+                    <div class="detail-value" id="senderName"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Passport/IC No #: </div>
+                    <div class="detail-value" id="passportOrIc"></div>
+                </div>
+                <div class="detail-row">      
+                    <div class="detail-key">Occupation:</div>
+                    <div class="detail-value" id="occupation"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Nationality</div>
+                    <div class="detail-value" id="nationality"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Phone/Mobile:</div>
+                    <div class="detail-value" id="senderMobile"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Address:</div>
+                    <div class="detail-value" id="senderAddress"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Source of Income:</div>
+                    <div class="detail-value" id="source"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Beneficiary Country:</div>
+                    <div class="detail-value" id="recipientCountry"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Receiver Name:</div>
+                    <div class="detail-value" id="beneficiaryName"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Bank Name:</div>
+                    <div class="detail-value" id="bankName"></div>
+                </div>
+                <div class="detail-row" id="accountNoSection" style="display: none;">
+                    <div class="detail-key">Account No:</div>
+                    <div class="detail-value" id="accountNo"></div>
+                </div>
+                <div class="detail-row" id="branchCodeSection" style="display: none;">
+                    <div class="detail-key">Branch Code:</div>
+                    <div class="detail-value" id="branchCode"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Address:</div>
+                    <div class="detail-value" id="beneficiaryAddress"></div>
+                </div>
+                <div class="detail-row" id="beneficiaryMobileSection" style="display: none;">
+                    <div class="detail-key">Mobile:</div>
+                    <div class="detail-value" id="beneficiaryMobile"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Purpose of Remittance:</div>
+                    <div class="detail-value" id="purpose"></div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="detail-row right-align">
+                    <div class="detail-key">Receipt No:</div>
+                    <div class="detail-value" id="receiptId"></div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Date:</div>
+                    <div class="detail-value" id="localTime"></div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Collected Amount:</div>
+                    <div class="detail-value" id="totalAmount"></div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Service Charge:</div>
+                    <div class="detail-value" id="serviceCharge"></div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Send Amount:</div>
+                    <div class="detail-value" id="sendAmount"></div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Rate:</div>
+                    <div class="detail-value" id="exchangeRate"></div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Premium:</div>
+                    <div class="detail-value" id="premium"></div>
+                </div>
+                <div class="highlight-box">
+                    <div class="detail-row right-align">
+                        <div class="detail-key">Pay Out Amount:</div>
+                        <div class="detail-value amount-highlight" id="payoutAmount"></div>
+                    </div>
+                </div>
+                <div class="detail-row right-align">
+                    <div class="detail-key">Payment Type:</div>
+                    <div class="detail-value" id="paymentMethod"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            
+        </div>
+        
+        <button class="download-btn" id="downloadBtn">
+            Download Receipt
+        </button>
+    </div>
+
+    <script>
+        // Country to flag mapping with aliases
+        const countryFlagMap = {
+            'india': { flag: 'https://flagcdn.com/w40/in.png', name: 'India', code: 'INDIA', currency: 'INR' },
+            'indian': { flag: 'https://flagcdn.com/w40/in.png', name: 'India', code: 'INDIA', currency: 'INR' },
+            'bangladesh': { flag: 'https://flagcdn.com/w40/bd.png', name: 'Bangladesh', code: 'BANGLADESH', currency: 'BDT' },
+            'china': { flag: 'https://flagcdn.com/w40/cn.png', name: 'China', code: 'CHINA', currency: 'CNY' },
+            'chinese': { flag: 'https://flagcdn.com/w40/cn.png', name: 'China', code: 'CHINA', currency: 'CNY' },
+            'thailand': { flag: 'https://flagcdn.com/w40/th.png', name: 'Thailand', code: 'THAILAND', currency: 'THB' },
+            'thai': { flag: 'https://flagcdn.com/w40/th.png', name: 'Thailand', code: 'THAILAND', currency: 'THB' },
+            'indonesia': { flag: 'https://flagcdn.com/w40/id.png', name: 'Indonesia', code: 'INDONESIA', currency: 'IDR' },
+            'indonesian': { flag: 'https://flagcdn.com/w40/id.png', name: 'Indonesia', code: 'INDONESIA', currency: 'IDR' },
+            'philippines': { flag: 'https://flagcdn.com/w40/ph.png', name: 'Philippines', code: 'PHILIPPINES', currency: 'PHP' },
+            'filipino': { flag: 'https://flagcdn.com/w40/ph.png', name: 'Philippines', code: 'PHILIPPINES', currency: 'PHP' },
+            'pakistan': { flag: 'https://flagcdn.com/w40/pk.png', name: 'Pakistan', code: 'PAKISTAN', currency: 'PKR' },
+            'pakistani': { flag: 'https://flagcdn.com/w40/pk.png', name: 'Pakistan', code: 'PAKISTAN', currency: 'PKR' },
+            'sri lanka': { flag: 'https://flagcdn.com/w40/lk.png', name: 'Sri Lanka', code: 'SRI LANKA', currency: 'LKR' },
+            'srilanka': { flag: 'https://flagcdn.com/w40/lk.png', name: 'Sri Lanka', code: 'SRI LANKA', currency: 'LKR' },
+            'uae': { flag: 'https://flagcdn.com/w40/ae.png', name: 'UAE', code: 'UAE', currency: 'AED' },
+            'united arab emirates': { flag: 'https://flagcdn.com/w40/ae.png', name: 'UAE', code: 'UAE', currency: 'AED' },
+            'japan': { flag: 'https://flagcdn.com/w40/jp.png', name: 'Japan', code: 'JAPAN', currency: 'JPY' },
+            'japanese': { flag: 'https://flagcdn.com/w40/jp.png', name: 'Japan', code: 'JAPAN', currency: 'JPY' },
+            'south korea': { flag: 'https://flagcdn.com/w40/kr.png', name: 'SOUTH KOREA', code: 'SOUTH KOREA', currency: 'KRW' },
+            'korea': { flag: 'https://flagcdn.com/w40/kr.png', name: 'South Korea', code: 'SOUTH KOREA', currency: 'KRW' },
+            'malaysia': { flag: 'https://flagcdn.com/w40/my.png', name: 'Malaysia', code: 'MALAYSIA', currency: 'MYR' },
+            'malaysian': { flag: 'https://flagcdn.com/w40/my.png', name: 'Malaysia', code: 'MALAYSIA', code: 'MALAYSIA', currency: 'MYR' },
+            'singapore': { flag: 'https://flagcdn.com/w40/sg.png', name: 'Singapore', code: 'SINGAPORE', currency: 'SGD' },
+            'nepal': { flag: 'https://flagcdn.com/w40/np.png', name: 'Nepal', code: 'NEPAL', currency: 'NPR' },
+            'nepali': { flag: 'https://flagcdn.com/w40/np.png', name: 'Nepal', code: 'NEPAL', currency: 'NPR' },
+            'vietnam': { flag: 'https://flagcdn.com/w40/vn.png', name: 'Vietnam', code: 'VIETNAM', currency: 'VND' },
+            'vietnamese': { flag: 'https://flagcdn.com/w40/vn.png', name: 'Vietnam', code: 'VIETNAM', code: 'VIETNAM', currency: 'VND' },
+            'united kingdom': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' },
+            'uk': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' },
+            'britain': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' },
+            'great britain': { flag: 'https://flagcdn.com/w40/gb.png', name: 'United Kingdom', code: 'UNITED KINGDOM', currency: 'GBP' }
+        };
+
+        // Extract URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const payoutCountryRaw = params.get('payoutCountry') || 'N/A';
+        const payoutCountryNormalized = payoutCountryRaw.toLowerCase().trim()
+            .replace(/\s+/g, ' ')
+            .replace(/^(the\s+)/i, '');
+
+        // Try exact match first
+        let countryDetails = countryFlagMap[payoutCountryNormalized];
+
+        // If no exact match, try partial matches or common variations
+        if (!countryDetails) {
+            const countryKeys = Object.keys(countryFlagMap);
+            for (const key of countryKeys) {
+                if (payoutCountryNormalized.includes(key) || key.includes(payoutCountryNormalized)) {
+                    countryDetails = countryFlagMap[key];
+                    break;
+                }
+            }
+        }
+
+        // Fallback if no match is found
+        if (!countryDetails) {
+            countryDetails = {
+                flag: 'https://flagcdn.com/w40/xx.png',
+                name: payoutCountryRaw.toUpperCase(),
+                code: payoutCountryRaw.toUpperCase(),
+                currency: 'CURRENCY'
+            };
+        }
+
+        // Function to generate 2 random digits
+        const randomDigits = () => Math.floor(Math.random() * 100).toString().padStart(2, '0');
+
+        // Function to add commas to a number
+        const addCommas = (numStr) => {
+            if (!numStr || numStr === 'N/A') return 'N/A';
+            const parts = numStr.toString().split('.');
+            const integerPart = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return parts.length > 1 ? `${integerPart}.${parts[1]}` : integerPart;
+        };
+
+        // Function to format and validate input
+        const formatValue = (value) => {
+            return value && value !== 'N/A' ? value.toUpperCase() : 'N/A';
+        };
+
+        // Prepare data object
+        const data = {
+            date: formatValue(params.get('date')),
+            referenceNumber: formatValue(params.get('referenceNumber') || params.get('txn') || params.get('ref') || 'N/A'),
+            totalAmount: params.get('totalAmount') ? `${addCommas(params.get('totalAmount').replace(/ BND$/, ''))} BND` : 'N/A',
+            serviceCharge: params.get('serviceCharge') ? `${addCommas(params.get('serviceCharge').replace(/ BND$/, ''))} BND` : 'N/A',
+            sendAmount: params.get('payInAmount') ? `${addCommas(params.get('payInAmount').replace(/ BND$/, ''))} BND` : 'N/A',
+            exchangeRate: params.get('exchangeRate') ? `1 BND = ${addCommas(params.get('exchangeRate').replace(/\s*[A-Z]{3}$/, ''))} ${countryDetails.currency}` : 'N/A',
+            payoutAmount: params.get('amount') ? `${addCommas(params.get('amount').replace(/\s*[A-Z]{3}$/, ''))} ${countryDetails.currency}` : 'N/A',
+            beneficiaryName: formatValue(params.get('beneficiaryName')),
+            bankName: formatValue(params.get('bankName')),
+            accountNo: formatValue(params.get('accountNo')),
+            ifscCode: formatValue(params.get('ifscCode')),
+            branchCode: formatValue(params.get('ifscCode') || 'N/A'),
+            beneficiaryAddress: formatValue(params.get('payoutCountry')),
+            beneficiaryMobile: formatValue(params.get('beneficiaryMobile')),
+            purpose: formatValue(params.get('purpose')),
+            senderName: formatValue(params.get('senderName')),
+            nationalId: formatValue(params.get('nationalId')),
+            passport: formatValue(params.get('passport')),
+            occupation: formatValue(params.get('profession')),
+            senderMobile: params.get('senderMobile') ? `+673 ${params.get('senderMobile')}` : 'N/A',
+            senderAddress: 'BRUNEI',
+            source: formatValue(params.get('source')),
+            pin: formatValue(params.get('pin')),
+            validityDate: formatValue(params.get('validityDate')),
+            receiptId: formatValue(params.get('referenceNumber') || params.get('txn') || params.get('ref') || 'N/A'),
+            localTime: formatValue(params.get('date')),
+            premium: params.get('amount') ? `${addCommas(params.get('amount').replace(/\s*[A-Z]{3}$/, ''))} ${countryDetails.currency}` : 'N/A',
+            custId: formatValue(params.get('custId')),
+            recipientCountry: formatValue(params.get('payoutCountry')),
+            payoutCode: formatValue(params.get('payoutCode'))
+        };
+
+        // Update reference number if needed
+        if (data.referenceNumber !== 'N/A' && !params.get('referenceNumber')) {
+            const prefix = randomDigits();
+            const suffix = randomDigits();
+            data.referenceNumber = `${prefix}${data.referenceNumber}${suffix}`;
+            data.receiptId = data.referenceNumber;
+        }
+
+        // Update payment method
+        let paymentMethod = formatValue(params.get('paymentChannel'));
+        if (paymentMethod === 'N/A') {
+            paymentMethod = 'CASH PICKUP';
+        } else if (['REAL TIME', 'BANK TRANSFER'].includes(paymentMethod)) {
+            paymentMethod = 'ACCOUNT CREDIT';
+        }
+
+        // Determine which ID to show (IC No preferred over passport)
+        const passportOrIc = data.nationalId !== 'N/A' ? data.nationalId : (data.passport !== 'N/A' ? data.passport : 'N/A');
+
+        // Populate receipt with values
+        const pinnoElement = document.getElementById('pinno');
+        if (data.pin !== 'N/A') {
+            pinnoElement.style.display = 'block';
+            document.getElementById('pin').textContent = data.pin;
+        }
+
+        const payoutCodeSection = document.getElementById('payoutCodeSection');
+        if (data.payoutCode !== 'N/A') {
+            payoutCodeSection.style.display = 'block';
+            document.getElementById('payoutCode').textContent = data.payoutCode;
+        }
+
+        const custIdElement = document.getElementById('custId');
+        if (data.custId !== 'N/A') {
+            custIdElement.style.display = 'block';
+            document.getElementById('custIdValue').textContent = data.custId;
+        }
+
+        const validitySection = document.getElementById('validitySection');
+        if (data.validityDate !== 'N/A') {
+            validitySection.style.display = 'block';
+            document.getElementById('validityDate').textContent = data.validityDate;
+        }
+
+        document.getElementById('senderName').textContent = data.senderName;
+        document.getElementById('passportOrIc').textContent = passportOrIc;
+        document.getElementById('occupation').textContent = data.occupation;
+        document.getElementById('nationality').textContent = data.recipientCountry;
+        document.getElementById('senderMobile').textContent = data.senderMobile;
+        document.getElementById('senderAddress').textContent = data.senderAddress;
+        document.getElementById('source').textContent = data.source;
+        document.getElementById('recipientCountry').textContent = data.recipientCountry;
+        document.getElementById('beneficiaryName').textContent = data.beneficiaryName;
+        document.getElementById('bankName').textContent = data.bankName;
+        document.getElementById('accountNo').textContent = data.accountNo;
+        document.getElementById('branchCode').textContent = data.branchCode;
+        document.getElementById('beneficiaryAddress').textContent = data.beneficiaryAddress;
+
+        const beneficiaryMobileSection = document.getElementById('beneficiaryMobileSection');
+        if (data.beneficiaryMobile !== 'N/A') {
+            beneficiaryMobileSection.style.display = 'flex';
+            document.getElementById('beneficiaryMobile').textContent = data.beneficiaryMobile;
+        } else {
+            beneficiaryMobileSection.style.display = 'none';
+        }
+
+        document.getElementById('purpose').textContent = data.purpose;
+        document.getElementById('receiptId').textContent = data.receiptId;
+        document.getElementById('localTime').textContent = data.localTime;
+        document.getElementById('totalAmount').textContent = data.totalAmount;
+        document.getElementById('serviceCharge').textContent = data.serviceCharge;
+        document.getElementById('sendAmount').textContent = data.sendAmount;
+        document.getElementById('exchangeRate').textContent = data.exchangeRate;
+        document.getElementById('premium').textContent = data.premium;
+        document.getElementById('payoutAmount').textContent = data.payoutAmount;
+        document.getElementById('paymentMethod').textContent = paymentMethod;
+
+        // Toggle Account No section visibility
+        const accountNoSection = document.getElementById('accountNoSection');
+        if (data.accountNo === 'N/A' || !data.accountNo) {
+            accountNoSection.style.display = 'none';
+        } else {
+            accountNoSection.style.display = 'flex';
+        }
+
+        // Toggle Branch Code section visibility
+        const branchCodeSection = document.getElementById('branchCodeSection');
+        if (data.branchCode === 'N/A' || !data.branchCode) {
+            branchCodeSection.style.display = 'none';
+        } else {
+            branchCodeSection.style.display = 'flex';
+        }
+
+        // Download button functionality
+        document.getElementById('downloadBtn').addEventListener('click', () => {
+            const element = document.getElementById('receiptContainer');
+            const downloadBtn = document.getElementById('downloadBtn');
+            downloadBtn.style.display = 'none';
+
+            setTimeout(() => {
+                const opt = {
+                    margin: [0.5, 0.5, 0.5, 0.5],
+                    filename: `Remittance_Receipt_${data.referenceNumber}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: {
+                        scale: 2,
+                        scrollY: 0,
+                        useCORS: true,
+                        logging: false
+                    },
+                    jsPDF: {
+                        unit: 'in',
+                        format: 'letter',
+                        orientation: 'portrait'
+                    }
+                };
+
+                html2pdf().set(opt).from(element).save().then(() => {
+                    downloadBtn.style.display = 'flex';
+                });
+            }, 200);
+        });
+
+        // Trigger auto-download if specified
+        if (params.get('autoDownload') === 'true') {
+            document.getElementById('downloadBtn').click();
+        }
+    </script>
+</body>
+</html>
