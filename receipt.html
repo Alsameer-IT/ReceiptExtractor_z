@@ -171,19 +171,19 @@
         <div class="content-section">
             <div class="left-column">
                 <div class="detail-row">
-                    <div class="detail-key">Sender Name: </div>
+                    <div class="detail-key">Sender Name:</div>
                     <div class="detail-value" id="senderName"></div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-key">Passport/IC No #: </div>
-                    <div class="detail-value" id="passportOrIc"></div>
-                </div>
-                <div class="detail-row">      
-                    <div class="detail-key">Occupation:</div>
-                    <div class="detail-value" id="occupation"></div>
+                    <div class="detail-key">Passport No:</div>
+                    <div class="detail-value" id="passport"></div>
                 </div>
                 <div class="detail-row">
-                    <div class="detail-key">Nationality</div>
+                    <div class="detail-key">IC No:</div>
+                    <div class="detail-value" id="nationalId"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-key">Nationality:</div>
                     <div class="detail-value" id="nationality"></div>
                 </div>
                 <div class="detail-row">
@@ -390,7 +390,6 @@
             senderName: formatValue(params.get('senderName')),
             nationalId: formatValue(params.get('nationalId')),
             passport: formatValue(params.get('passport')),
-            occupation: formatValue(params.get('profession')),
             senderMobile: params.get('senderMobile') ? `+673 ${params.get('senderMobile')}` : 'N/A',
             senderAddress: 'BRUNEI',
             source: formatValue(params.get('source')),
@@ -420,9 +419,6 @@
             paymentMethod = 'ACCOUNT CREDIT';
         }
 
-        // Determine which ID to show (IC No preferred over passport)
-        const passportOrIc = data.nationalId !== 'N/A' ? data.nationalId : (data.passport !== 'N/A' ? data.passport : 'N/A');
-
         // Populate receipt with values
         const pinnoElement = document.getElementById('pinno');
         if (data.pin !== 'N/A') {
@@ -449,8 +445,8 @@
         }
 
         document.getElementById('senderName').textContent = data.senderName;
-        document.getElementById('passportOrIc').textContent = passportOrIc;
-        document.getElementById('occupation').textContent = data.occupation;
+        document.getElementById('passport').textContent = data.passport;
+        document.getElementById('nationalId').textContent = data.nationalId;
         document.getElementById('nationality').textContent = data.recipientCountry;
         document.getElementById('senderMobile').textContent = data.senderMobile;
         document.getElementById('senderAddress').textContent = data.senderAddress;
