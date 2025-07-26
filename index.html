@@ -338,7 +338,7 @@
             // Determine which ID to use (passport or IC)
             const idToUse = data.passportNo !== 'N/A' ? data.passportNo : data.icNo;
             
-            // Create URL with all necessary parameters
+            // Create URL with all necessary parameters, including nationalId (IC No)
             const params = new URLSearchParams({
                 date: data.date,
                 referenceNumber: data.receiptNo,
@@ -355,7 +355,7 @@
                 purpose: data.purpose,
                 senderName: data.senderName,
                 passport: data.passportNo,
-                nationalId: data.icNo,
+                nationalId: data.icNo, 
                 profession: data.source,
                 senderMobile: data.senderMobile,
                 senderAddress: data.senderAddress,
